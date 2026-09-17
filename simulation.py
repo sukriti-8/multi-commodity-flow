@@ -136,61 +136,64 @@ if __name__ == "__main__":
             f"Routed = {result['routed']} | "
             f"Remaining = {result['remaining']}"
         )
-        # Calculate overall metrics
-        total_demand = sum(
-            result["demand"] for result in results
-        )
 
-        total_routed = sum(
-            result["routed"] for result in results
-        )
 
-        satisfied_commodities = sum(
-            1
-            for result in results
-            if result["remaining"] == 0
-        )
+    # Calculate overall metrics
+    total_demand = sum(
+        result["demand"] for result in results
+    )
 
-        max_utilization = 0
+    total_routed = sum(
+        result["routed"] for result in results
+    )
 
-        for u, v, data in graph.edges(data=True):
+    satisfied_commodities = sum(
+        1
+        for result in results
+        if result["remaining"] == 0
+    )
 
-            if data["capacity"] > 0:
+    max_utilization = 0
 
-                utilization = (
-                    data["used"] / data["capacity"]
-                )
+    for u, v, data in graph.edges(data=True):
 
-                max_utilization = max(
-                    max_utilization,
-                    utilization
-                )
+        if data["capacity"] > 0:
 
-        print("\nPERFORMANCE METRICS")
-        print("=" * 40)
+            utilization = (
+                data["used"] / data["capacity"]
+            )
 
-        print(f"Total demand: {total_demand}")
-        print(f"Total routed: {total_routed}")
-        print(
-            f"Satisfied commodities: "
-            f"{satisfied_commodities} / {len(results)}"
-        )
+            max_utilization = max(
+                max_utilization,
+                utilization
+            )
 
-        print(
-            f"Maximum link utilization: "
-            f"{max_utilization * 100:.2f}%"
-        )
 
-        print(
-            f"Runtime: "
-            f"{runtime * 1000:.4f} ms"
-        )
+    print("\nPERFORMANCE METRICS")
+    print("=" * 40)
 
-        print(
-            f"Memory change: "
-            f"{memory_used / 1024:.2f} KB"
-        )
+    print(f"Total demand: {total_demand}")
+    print(f"Total routed: {total_routed}")
 
+    print(
+        f"Satisfied commodities: "
+        f"{satisfied_commodities} / {len(results)}"
+    )
+
+    print(
+        f"Maximum link utilization: "
+        f"{max_utilization * 100:.2f}%"
+    )
+
+    print(
+        f"Runtime: "
+        f"{runtime * 1000:.4f} ms"
+    )
+
+    print(
+        f"Memory change: "
+        f"{memory_used / 1024:.2f} KB"
+    )
     print("\nFINAL LINK UTILIZATION")
     print("=" * 40)
 

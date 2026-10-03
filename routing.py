@@ -46,8 +46,6 @@ def create_commodities():
 
     return commodities
 
-
-
 #edge-cost fnc 
 def edge_cost(graph, u, v, alpha=2.0):
     """

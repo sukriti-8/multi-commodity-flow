@@ -26,7 +26,8 @@ st.set_page_config(
 
 def reset_network(graph):
     """Reset all link usage to zero."""
-    for u, v, data in graph.edges(data=True):
+
+    for _, _, data in graph.edges(data=True):
         data["used"] = 0
 
 
@@ -132,7 +133,7 @@ def draw_network(graph, results=None):
         x=node_x,
         y=node_y,
         mode="markers+text",
-        text=list(graph.nodes()),
+        text=[str(node) for node in graph.nodes()],
         textposition="top center",
         hovertext=node_text,
         hoverinfo="text",
@@ -173,6 +174,7 @@ def draw_network(graph, results=None):
 
 
 def results_table(results):
+    """Create a table containing commodity routing results."""
 
     rows = []
 
@@ -200,6 +202,7 @@ def results_table(results):
 
 
 def route_details(results):
+    """Create a table containing the selected routing paths."""
 
     details = []
 
@@ -210,9 +213,14 @@ def route_details(results):
             details.append(
                 {
                     "Commodity": result["commodity"],
+
+                    # Convert numeric node IDs to strings
+                    # before joining them.
                     "Path": " → ".join(
-                        route["path"]
+                        str(node)
+                        for node in route["path"]
                     ),
+
                     "Flow": route["flow"]
                 }
             )
@@ -337,18 +345,21 @@ st.plotly_chart(
 col1, col2, col3 = st.columns(3)
 
 with col1:
+
     st.metric(
         "Nodes",
         len(graph.nodes)
     )
 
 with col2:
+
     st.metric(
         "Links",
         len(graph.edges)
     )
 
 with col3:
+
     st.metric(
         "Commodities",
         len(commodities)
@@ -441,6 +452,10 @@ if run_button:
         shortest_results
     )
 
+    # ---------------------------------------------
+    # Save Results in Session State
+    # ---------------------------------------------
+
     st.session_state.greedy_results = greedy_results
     st.session_state.greedy_metrics = greedy_metrics
 
@@ -472,6 +487,10 @@ if st.session_state.has_run:
 
     greedy_memory = st.session_state.greedy_memory
 
+    # ---------------------------------------------
+    # Greedy Routing Header
+    # ---------------------------------------------
+
     st.header(
         "3. Greedy Capacity-Aware Routing"
     )
@@ -483,18 +502,21 @@ if st.session_state.has_run:
     c1, c2, c3, c4 = st.columns(4)
 
     with c1:
+
         st.metric(
             "Total Demand",
             greedy_metrics["total_demand"]
         )
 
     with c2:
+
         st.metric(
             "Total Routed",
             greedy_metrics["total_routed"]
         )
 
     with c3:
+
         st.metric(
             "Satisfied",
             f"{greedy_metrics['satisfied']} / "
@@ -502,6 +524,7 @@ if st.session_state.has_run:
         )
 
     with c4:
+
         st.metric(
             "Max Utilization",
             f"{greedy_metrics['max_utilization'] * 100:.1f}%"
@@ -535,6 +558,13 @@ if st.session_state.has_run:
             details,
             use_container_width=True,
             hide_index=True
+        )
+
+    else:
+
+        st.info(
+            "No routes were selected for the current "
+            "commodity configuration."
         )
 
     # ---------------------------------------------
@@ -637,9 +667,11 @@ if st.session_state.has_run:
         {
             "Metric": "Satisfied Commodities",
             "Greedy Capacity-Aware":
-                f"{greedy_metrics['satisfied']} / {len(greedy_results)}",
+                f"{greedy_metrics['satisfied']} / "
+                f"{len(greedy_results)}",
             "Shortest Path":
-                f"{shortest_metrics['satisfied']} / {len(shortest_results)}"
+                f"{shortest_metrics['satisfied']} / "
+                f"{len(shortest_results)}"
         },
 
         {
@@ -678,6 +710,7 @@ if st.session_state.has_run:
         "The capacity-aware approach considers current "
         "link congestion when selecting among candidate paths."
     )
+
 
 else:
 
